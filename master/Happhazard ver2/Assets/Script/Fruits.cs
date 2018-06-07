@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Fruits : MonoBehaviour {
-
+    public GameObject DestroyButton;
+    public GameObject GatheringButton;
     public GameObject fruits;
     // Use this for initialization
     void Start () {
@@ -19,5 +20,7 @@ public class Fruits : MonoBehaviour {
     {
         Destroy(this.gameObject);
         Instantiate(fruits, transform.position, Quaternion.identity);
+        DestroyButton.SetActive(false);
+        GatheringButton.SetActive(false);
     }
 }

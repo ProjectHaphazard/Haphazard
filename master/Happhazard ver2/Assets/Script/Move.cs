@@ -1,112 +1,54 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.AI;
+using UnityEngine.UI;
 using UnityEngine;
 
- 
-public class Move : MonoBehaviour
-{
-    private Vector3 targetPosition; //移動する位置
+public class Move : MonoBehaviour {
+
+    //private Vector3 targetPosition; //移動する位置
+    public GameObject DestroyButton;
+    public GameObject GatheringButton;
+    public string Fixationtag = "Fixation";
     private NavMeshAgent agent;
-    private Animator animator;
     private RaycastHit hit;
     private Ray ray;
+    static Canvas _canvas;
 
-    private const string flg_isRight = "is_Right";
-    private const string flg_isLeft = "is_Left";
-    private const string flg_isWait = "is_Wait";
-    private const string flg_isBefor = "is_Befor";
-    private const string flg_isAfter = "is_After";
-
-
-    void Start()
-    {
+    // Use this for initialization
+    void Start () {
+        // Canvasコンポーネントを保持
+        _canvas = GetComponent<Canvas>();
+        DestroyButton.SetActive(false);
+        GatheringButton.SetActive(false);
         agent = GetComponent<NavMeshAgent>();
-        animator = GetComponent<Animator>();//後から変更
-        this.animator.SetBool(flg_isWait, false);
     }
-
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
+	
+	// Update is called once per frame
+	void Update () {
+		if (Input.GetMouseButtonUp(0))
         {
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit, 100))
+
+            if (Physics.Raycast(ray,out hit,100))
             {
-                targetPosition = hit.point;
-                //agent.SetDestination(targetPosition); //移動させる処理
-
-                if (transform.position.x > targetPosition.x) //プレイヤーの位置よりもクリック位置が左のときに実行
+                if (hit.collider.gameObject)
                 {
-                    animator.SetFloat("speed", agent.velocity.magnitude);
-                    this.animator.SetBool(flg_isRight, false);
-                    this.animator.SetBool(flg_isLeft, true);
-                    this.animator.SetBool(flg_isWait, false);
-                    this.animator.SetBool(flg_isBefor, false);
-                    this.animator.SetBool(flg_isAfter, false);
+                    agent.SetDestination(hit.point);
+                    if (hit.collider.gameObject.CompareTag(Fixationtag))
+                    {
+                        agent.SetDestination(hit.point);
+                        DestroyButton.SetActive(true);
+                        GatheringButton.SetActive(true);
+                        Debug.Log("HitTree");
+                    }
+                    else
+                    {
+                        //DestroyButton.SetActive(false);
+                        //GatheringButton.SetActive(false);
+                    }
                 }
-                else
-                {
-                    this.animator.SetBool(flg_isLeft, false);
-                }
-
-                if (transform.position.x < targetPosition.x)
-                {
-                    animator.SetFloat("speed", agent.velocity.magnitude);
-                    this.animator.SetBool(flg_isRight, true);
-                    this.animator.SetBool(flg_isWait, false);
-                    this.animator.SetBool(flg_isBefor, false);
-                    this.animator.SetBool(flg_isAfter, false);
-                    this.animator.SetBool(flg_isLeft, false);
-
-                }
-                else
-                {
-                    this.animator.SetBool(flg_isRight, false);
-                }
-
-                if (transform.position.z > targetPosition.z)
-                {
-                    animator.SetFloat("speed", agent.velocity.magnitude);
-                    this.animator.SetBool(flg_isBefor, true);
-                    this.animator.SetBool(flg_isAfter, false);
-                    this.animator.SetBool(flg_isRight, false);
-                    this.animator.SetBool(flg_isLeft, false);
-                    this.animator.SetBool(flg_isWait, false);
-                }
-                else
-                {
-                    this.animator.SetBool(flg_isBefor, false);
-                }
-
-                if (transform.position.z < targetPosition.z)
-                {
-                    animator.SetFloat("speed", agent.velocity.magnitude);
-                    this.animator.SetBool(flg_isBefor, false);
-                    this.animator.SetBool(flg_isAfter, true);
-                    this.animator.SetBool(flg_isRight, false);
-                    this.animator.SetBool(flg_isLeft, false);
-                    this.animator.SetBool(flg_isWait, false);
-                }
-                else
-                {
-                    this.animator.SetBool(flg_isAfter, false);
-                }
-
-            }
-
-            if(transform.position == targetPosition)
-            {
-                this.animator.SetBool(flg_isWait, true);
-                this.animator.SetBool(flg_isRight, false);
-                this.animator.SetBool(flg_isLeft, false);
-                this.animator.SetBool(flg_isBefor, false);
-                this.animator.SetBool(flg_isAfter, false);
-            }
-            else
-            {
-                agent.SetDestination(targetPosition); //移動させる処理
             }
         }
-    }
+	}
 }
